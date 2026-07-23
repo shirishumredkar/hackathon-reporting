@@ -1,0 +1,58 @@
+name: 'Build and Deploy Application'
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: 'project-495bdca4-ac50-4df5-bb6'
+  PROJECT_NUMBER: '272907652960'
+  REGISTRY_URL: 'us-central1-docker.pkg.dev/project-495bdca4-ac50-4df5-bb6/app-docker-images' 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Connect to GCP via working WIF
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: 'projects/272907652960/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'tf-github-actions@project-495bdca4-ac50-4df5-bb6.iam.gserviceaccount.com'
+
+    # Log into Docker with Google Credentials
+    - name: Docker Auth
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+    # F. Build and Tag Docker Image
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ env.REGISTRY_URL }}/my-app:${{ github.sha }} .
+        docker push ${{ env.REGISTRY_URL }}/my-app:${{ github.sha }}
+
+    # Setup and Run Terraform Deployment
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init
+      run: terraform init
+
+    # Deploy App Infrastructure supplying output data from Phase 1
+    - name: Terraform Apply
+      run: |
+        terraform apply -auto-approve \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="registry_url=${{ env.REGISTRY_URL }}" \
+          -var="image_tag=${{ github.sha }}" \
+          -var="vpc_connector_id=projects/${{ env.PROJECT_ID }}/locations/us-central1/connectors/cr-vpc-connector" \
+          -var="kms_key_id=projects/${{ env.PROJECT_ID }}/locations/us-central1/keyRings/cloudrun-keyring/cryptoKeys/cloudrun-customer-key" \
+          -var="cloudrun_sa_email=cloud-run-runtime-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
