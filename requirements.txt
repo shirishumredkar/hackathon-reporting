@@ -16,3 +16,6 @@ langchain_google_community
 langchain_classic
 langchain_community
 pypdf
+python-dotenv
+gunicorn
+transformers>=4.30.0
