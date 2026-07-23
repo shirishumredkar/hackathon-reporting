@@ -1,0 +1,22 @@
+{
+  "CUSTOMER": {
+    "dataset": "reporting_ai_dataset",
+    "table": "customer"
+  },
+  "CARD": {
+    "dataset": "reporting_ai_dataset",
+    "table": "card"
+  },
+  "TRANSACTION": {
+    "dataset": "reporting_ai_dataset",
+    "table": "transaction"
+  },
+  "FRAUD_SCORE": {
+    "dataset": "reporting_ai_dataset",
+    "table": "fraud_score"
+  },
+  "FRAUD_ALERT": {
+    "dataset": "reporting_ai_dataset",
+    "table": "fraud_alert"
+  }
+}

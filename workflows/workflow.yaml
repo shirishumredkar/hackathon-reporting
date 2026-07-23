@@ -1,0 +1,36 @@
+entry_point: router
+nodes:
+  router:
+    class: RouterNode
+    next:
+      INFORMATION: information
+      QUERY: table_identifier
+  information:
+    class: InformationNode
+    end: true
+  table_identifier:
+    class: TableIdentifierNode
+    next: metadata
+  metadata:
+    class: MetadataNode
+    next: sql_generation
+  sql_generation:
+    class: SQLGenerationNode
+    next: validation
+  validation:
+    class: ValidationNode
+    next: dryrun
+  dryrun:
+    class: DryRunNode
+    next: approval
+  approval:
+    class: ApprovalNode
+    next:
+      APPROVED: execute
+      REJECTED: end
+  execute:
+    class: ExecuteNode
+    next: csv_export
+  csv_export:
+    class: CsvExportNode
+    end: true
