@@ -12,7 +12,6 @@ logging.basicConfig(
     level=logging.INFO,  # Standardized to INFO (DEBUG can leak auth tokens)
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
-        logging.FileHandler("app_error.log", encoding="utf-8"),
         logging.StreamHandler(sys.stdout)
     ]
 )
