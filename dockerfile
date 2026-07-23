@@ -16,4 +16,5 @@ EXPOSE 8080
 
 # Step 6: Run the application using the python runtime engine
 # CMD ["python", "app.py"]
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2","--timeout", "360", "myproject.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "360", "-k", "uvicorn.workers.UvicornWorker", "app:app"]
+
